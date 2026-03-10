@@ -4,7 +4,6 @@
   "description": "ZK Prediction Market",
   "main": "index.js",
   "scripts": {
-    "build": "cd frontend && npm install && npx next build --webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
