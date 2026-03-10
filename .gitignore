@@ -1,0 +1,31 @@
+# Environment
+.env
+.env.*
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Build
+contracts/artifacts/
+contracts/cache/
+contracts/typechain-types/
+frontend/.next/
+frontend/out/
+
+# Deployment logs (keep .example, ignore actual deployments)
+contracts/deployments/
+frontend/public/deployments/
+
+# Circuit build artifacts (large binary files)
+circuits/build/
+circuits/powersOfTau*.ptau
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/**/*_flat.sol
