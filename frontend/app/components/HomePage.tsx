@@ -183,14 +183,59 @@ export default function HomePage() {
                   </Button>
                 </div>
               </div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className="pointer-events-none order-first ml-auto h-56 w-full object-cover invert sm:h-96 lg:absolute lg:inset-0 lg:-right-20 lg:-top-96 lg:order-last lg:h-max lg:w-2/3 lg:object-contain dark:mix-blend-lighten dark:invert-0"
-                src="https://ik.imagekit.io/lrigu76hy/tailark/abstract-bg.jpg?updatedAt=1745733473768"
-                alt="Abstract Background"
-                height={4000}
-                width={3000}
-              />
+              {/* Animated ZK orb visual */}
+              <div className="pointer-events-none order-first ml-auto flex h-56 w-full items-center justify-center sm:h-96 lg:absolute lg:inset-y-0 lg:right-0 lg:order-last lg:h-full lg:w-1/2">
+                <div className="relative h-72 w-72 sm:h-96 sm:w-96">
+                  {/* Outer glow */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-600/20 via-indigo-500/10 to-transparent blur-3xl animate-pulse" />
+                  {/* Spinning ring 1 */}
+                  <motion.div
+                    className="absolute inset-4 rounded-full border border-violet-500/30"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                  >
+                    <div className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-violet-400 shadow-lg shadow-violet-500/50" />
+                  </motion.div>
+                  {/* Spinning ring 2 */}
+                  <motion.div
+                    className="absolute inset-12 rounded-full border border-indigo-500/25"
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+                  >
+                    <div className="absolute -bottom-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full bg-indigo-400 shadow-lg shadow-indigo-500/50" />
+                  </motion.div>
+                  {/* Spinning ring 3 */}
+                  <motion.div
+                    className="absolute inset-20 rounded-full border border-blue-500/20"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+                  >
+                    <div className="absolute -top-1 right-0 h-2 w-2 rounded-full bg-blue-400 shadow-lg shadow-blue-500/50" />
+                  </motion.div>
+                  {/* Center orb */}
+                  <div className="absolute inset-28 sm:inset-32 rounded-full bg-gradient-to-br from-violet-500 via-indigo-500 to-blue-500 shadow-2xl shadow-violet-500/30">
+                    <div className="flex h-full w-full items-center justify-center">
+                      <Shield className="h-8 w-8 sm:h-10 sm:w-10 text-white/90" />
+                    </div>
+                  </div>
+                  {/* Floating particles */}
+                  <motion.div
+                    className="absolute top-8 right-12 h-1.5 w-1.5 rounded-full bg-violet-400/60"
+                    animate={{ y: [-5, 5, -5], opacity: [0.4, 1, 0.4] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                  <motion.div
+                    className="absolute bottom-16 left-8 h-1 w-1 rounded-full bg-indigo-400/50"
+                    animate={{ y: [5, -5, 5], opacity: [0.3, 0.8, 0.3] }}
+                    transition={{ duration: 4, repeat: Infinity }}
+                  />
+                  <motion.div
+                    className="absolute top-1/3 right-4 h-1 w-1 rounded-full bg-blue-400/40"
+                    animate={{ y: [-3, 3, -3], opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 2.5, repeat: Infinity }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </section>
