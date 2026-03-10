@@ -33,6 +33,13 @@ const nextConfig: NextConfig = {
       ...config.experiments,
       asyncWebAssembly: true,
     };
+    // MetaMask SDK tries to import React Native modules that don't exist in web builds
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      '@react-native-async-storage/async-storage': false,
+    };
+    // Suppress the warning/error for missing optional peer deps
+    config.externals = [...(config.externals || []), '@react-native-async-storage/async-storage'];
     return config;
   },
 };
