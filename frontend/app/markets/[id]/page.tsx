@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useAccount, useReadContract, useWriteContract, useSwitchChain, useChainId } from 'wagmi';
 import { abis, useNetworkAddresses } from '@/lib/contracts';
 import { getAddressesByChainId } from '@/lib/networks/addresses';
+import { getDefaultNetwork } from '@/lib/networks';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { parseEther } from 'viem';
@@ -86,13 +87,14 @@ export default function MarketDetail() {
     try {
       setStatus('Computing commitment hash...');
       const commitment = await computeCommitment(prediction, secret, marketId);
-      // Ensure wallet is on the right chain before transacting
-      const targetChainId = chainId;
+      // Always target the default chain (where contracts are deployed)
+      const defaultNet = getDefaultNetwork();
+      const targetChainId = defaultNet.chainId;
       if (connectedChainId !== targetChainId) {
-        setStatus('Switching network...');
+        setStatus(`Switching to ${defaultNet.label}...`);
         await switchChainAsync({ chainId: targetChainId });
       }
-      // Resolve address fresh (not from stale React state)
+      // Resolve address fresh
       const addr = getAddressesByChainId(targetChainId);
       setStatus('Sending transaction...');
       const hash = await writeContractAsync({
@@ -167,9 +169,10 @@ export default function MarketDetail() {
       const [pA, pB, pC, pubSignals] = calldataArgs;
 
       // Ensure wallet is on the right chain
-      const targetChainId = chainId;
+      const defaultNet = getDefaultNetwork();
+      const targetChainId = defaultNet.chainId;
       if (connectedChainId !== targetChainId) {
-        setRevealStatus('Switching network...');
+        setRevealStatus(`Switching to ${defaultNet.label}...`);
         await switchChainAsync({ chainId: targetChainId });
       }
 

@@ -39,14 +39,22 @@ export default function MarketsPage() {
       return;
     }
     try {
-      // Ensure wallet is on the right chain before transacting
-      const targetChainId = chainId;
+      // Always target the default chain (where contracts are deployed)
+      const defaultNet = getDefaultNetwork();
+      const targetChainId = defaultNet.chainId;
+      const addr = getAddressesByChainId(targetChainId);
+
+      if (!addr.market || addr.market === '0x0000000000000000000000000000000000000000') {
+        setStatus('Error: No contract deployed on this network');
+        return;
+      }
+
+      // Switch wallet to the correct chain if needed
       if (connectedChainId !== targetChainId) {
-        setStatus('Switching network...');
+        setStatus(`Switching to ${defaultNet.label}...`);
         await switchChainAsync({ chainId: targetChainId });
       }
-      // Resolve address fresh (not from stale React state)
-      const addr = getAddressesByChainId(targetChainId);
+
       setStatus('Sending transaction...');
       const unixSeconds = Math.floor(new Date(resolutionTime).getTime() / 1000);
       const hash = await writeContractAsync({

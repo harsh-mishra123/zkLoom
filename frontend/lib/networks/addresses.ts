@@ -30,6 +30,10 @@ const FALLBACK_ADDRESSES: Partial<Record<NetworkSlug, ContractAddresses>> = {
     market: (process.env.NEXT_PUBLIC_HARDHAT_MARKET_ADDRESS as `0x${string}`) || '0x0000000000000000000000000000000000000000',
     settlementVerifier: (process.env.NEXT_PUBLIC_HARDHAT_VERIFIER_ADDRESS as `0x${string}`) || '0x0000000000000000000000000000000000000000',
   },
+  sepolia: {
+    market: (process.env.NEXT_PUBLIC_SEPOLIA_MARKET_ADDRESS as `0x${string}`) || '0x328882Fc63e88C4C1d7A1b3484C160De93b79c6D',
+    settlementVerifier: (process.env.NEXT_PUBLIC_SEPOLIA_VERIFIER_ADDRESS as `0x${string}`) || '0xDd1Bc6a49b6c3Aced7a0b347895994f7E72d143A',
+  },
 };
 
 // ─── Deployment JSON loader ─────────────────────────────────

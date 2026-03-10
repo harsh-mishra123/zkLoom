@@ -144,10 +144,14 @@ export const NETWORK_REGISTRY: Record<NetworkSlug, NetworkMeta> = {
 
 /** Resolve the default chain slug from env. */
 export function getDefaultChainSlug(): NetworkSlug {
-  const raw = process.env.NEXT_PUBLIC_DEFAULT_CHAIN || 'hardhat';
-  if (raw in NETWORK_REGISTRY) return raw as NetworkSlug;
-  console.warn(`[network] Unknown NEXT_PUBLIC_DEFAULT_CHAIN="${raw}", falling back to hardhat`);
-  return 'hardhat';
+  const raw = process.env.NEXT_PUBLIC_DEFAULT_CHAIN;
+  if (raw && raw in NETWORK_REGISTRY) return raw as NetworkSlug;
+  if (raw) {
+    console.warn(`[network] Unknown NEXT_PUBLIC_DEFAULT_CHAIN="${raw}", falling back`);
+  }
+  // In production (Vercel etc.), default to sepolia; locally default to hardhat
+  const fallback = process.env.NODE_ENV === 'production' ? 'sepolia' : 'hardhat';
+  return fallback;
 }
 
 /** Get the NetworkMeta for the current default chain. */
@@ -172,10 +176,11 @@ export function getEnabledChains(): [Chain, ...Chain[]] {
   const enableTestnets = process.env.NEXT_PUBLIC_ENABLE_TESTNETS !== 'false';
   const enableMainnets = process.env.NEXT_PUBLIC_ENABLE_MAINNETS === 'true';
 
+  const enableLocal = process.env.NODE_ENV !== 'production';
   const chains: Chain[] = [];
 
   for (const meta of Object.values(NETWORK_REGISTRY)) {
-    if (meta.tier === 'local') { chains.push(meta.chain); continue; }
+    if (meta.tier === 'local' && enableLocal) { chains.push(meta.chain); continue; }
     if (meta.tier === 'testnet' && enableTestnets) { chains.push(meta.chain); continue; }
     if (meta.tier === 'mainnet' && enableMainnets) { chains.push(meta.chain); continue; }
   }
@@ -191,7 +196,7 @@ export function getEnabledChains(): [Chain, ...Chain[]] {
   }
 
   // wagmi requires at least one chain
-  if (chains.length === 0) chains.push(hardhat);
+  if (chains.length === 0) chains.push(sepolia);
 
   return chains as [Chain, ...Chain[]];
 }

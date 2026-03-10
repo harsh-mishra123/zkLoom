@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAccount, useReadContract, useWriteContract, useSwitchChain, useChainId } from 'wagmi';
 import { abis, useNetworkAddresses } from '@/lib/contracts';
 import { getAddressesByChainId } from '@/lib/networks/addresses';
+import { getDefaultNetwork } from '@/lib/networks';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -224,9 +225,10 @@ function AdminMarketRow({ marketId }: { marketId: number }) {
   const handleResolve = async (outcomeValue: 1 | 2) => {
     try {
       setResolveStatus('Sending transaction...');
-      const targetChainId = chainId;
+      const defaultNet = getDefaultNetwork();
+      const targetChainId = defaultNet.chainId;
       if (connectedChainId !== targetChainId) {
-        setResolveStatus('Switching network...');
+        setResolveStatus(`Switching to ${defaultNet.label}...`);
         await switchChainAsync({ chainId: targetChainId });
       }
       const addr = getAddressesByChainId(targetChainId);
