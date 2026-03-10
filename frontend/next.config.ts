@@ -11,7 +11,11 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_SEPOLIA_MARKET_ADDRESS: process.env.NEXT_PUBLIC_SEPOLIA_MARKET_ADDRESS || '0x328882Fc63e88C4C1d7A1b3484C160De93b79c6D',
     NEXT_PUBLIC_SEPOLIA_VERIFIER_ADDRESS: process.env.NEXT_PUBLIC_SEPOLIA_VERIFIER_ADDRESS || '0xDd1Bc6a49b6c3Aced7a0b347895994f7E72d143A',
   },
-  turbopack: {},
+  turbopack: {
+    resolveAlias: {
+      '@react-native-async-storage/async-storage': '',
+    },
+  },
   images: {
     remotePatterns: [
       {
