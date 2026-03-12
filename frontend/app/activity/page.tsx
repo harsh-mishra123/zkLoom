@@ -504,7 +504,7 @@ function TimelineItem({ marketId }: { marketId: number }) {
     );
   }
 
-  const [question, resolutionTime, outcome, resolved] = market as [string, bigint, bigint, boolean, bigint, bigint, bigint];
+  const [question, resolutionTime, outcome, resolved] = market as [string, bigint, bigint, boolean, bigint, bigint, bigint, string];
   const resolutionDate = new Date(Number(resolutionTime) * 1000);
   const isActive = !resolved && resolutionDate > new Date();
 

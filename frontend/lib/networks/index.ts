@@ -1,4 +1,3 @@
-// ─── Network module barrel export ────────────────────────────
 export {
   NETWORK_REGISTRY,
   getDefaultChainSlug,

@@ -1,20 +1,11 @@
-// frontend/lib/contracts/addresses.ts
 export const CONTRACT_ADDRESSES = {
-    settlementVerifier: (process.env.NEXT_PUBLIC_SEPOLIA_VERIFIER_ADDRESS || '0xDd1Bc6a49b6c3Aced7a0b347895994f7E72d143A') as `0x${string}`,
-    market: (process.env.NEXT_PUBLIC_SEPOLIA_MARKET_ADDRESS || '0x328882Fc63e88C4C1d7A1b3484C160De93b79c6D') as `0x${string}`,
+    // Remix se copy kiye gaye addresses
+    commitmentVerifier: "0xd8b934580fcE35a11B58C6D73aDeE468a2833fa8",  // CommitmentVerifier ka address
+    settlementVerifier: "0xf8e81D47203A594245E36C48e151709F0C19fBe8",  // SettlementVerifier ka address
+    market: "0xD7ACd2a9FD159E69Bb102A1ca21C9a3e3A5F771B"               // zkPredictionMarket ka address
 } as const;
 
-export const TARGET_CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_DEFAULT_CHAIN_ID || '11155111') as number;
-
 export const NETWORK_CONFIG = {
-    local: {
-        chainId: 31337,
-        chainName: "Hardhat Local",
-        rpcUrl: process.env.NEXT_PUBLIC_LOCAL_RPC_URL || "http://127.0.0.1:8545"
-    },
-    sepolia: {
-        chainId: 11155111,
-        chainName: "Sepolia",
-        rpcUrl: process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL || ""
-    }
+    chainId: 11155111,  // Sepolia
+    chainName: "Sepolia"
 } as const;

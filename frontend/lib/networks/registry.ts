@@ -1,8 +1,4 @@
 // ─── Network Registry ────────────────────────────────────────
-// Single source of truth for every supported EVM network.
-// All runtime values are read from NEXT_PUBLIC_* env vars.
-// ─────────────────────────────────────────────────────────────
-
 import {
   hardhat,
   sepolia,
@@ -18,8 +14,6 @@ import {
   zkSync,
 } from 'wagmi/chains';
 import type { Chain } from 'wagmi/chains';
-
-// ─── Types ──────────────────────────────────────────────────
 
 export type NetworkSlug =
   | 'hardhat'
@@ -44,19 +38,12 @@ export interface NetworkMeta {
   tier: NetworkTier;
   label: string;
   chain: Chain;
-  /** env‑var prefix for contract addresses (e.g. "HARDHAT") */
   envPrefix: string;
-  /** Block explorer URL (if any) */
   explorerUrl?: string;
-  /** Default number of confirmation blocks before treating tx as final */
   confirmations: number;
-  /** Request timeout in ms */
   timeout: number;
-  /** Native currency symbol */
   currency: string;
 }
-
-// ─── Custom chain definition for Ganache ────────────────────
 
 const ganache: Chain = {
   id: 1337,
@@ -67,10 +54,7 @@ const ganache: Chain = {
   },
 };
 
-// ─── Registry ───────────────────────────────────────────────
-
 export const NETWORK_REGISTRY: Record<NetworkSlug, NetworkMeta> = {
-  // Local
   hardhat: {
     slug: 'hardhat', chainId: 31337, tier: 'local', label: 'Hardhat Local',
     chain: hardhat, envPrefix: 'HARDHAT', confirmations: 1, timeout: 5_000, currency: 'ETH',
@@ -79,8 +63,6 @@ export const NETWORK_REGISTRY: Record<NetworkSlug, NetworkMeta> = {
     slug: 'ganache', chainId: 1337, tier: 'local', label: 'Ganache',
     chain: ganache, envPrefix: 'GANACHE', confirmations: 1, timeout: 5_000, currency: 'ETH',
   },
-
-  // Testnets
   sepolia: {
     slug: 'sepolia', chainId: 11155111, tier: 'testnet', label: 'Sepolia',
     chain: sepolia, envPrefix: 'SEPOLIA', explorerUrl: 'https://sepolia.etherscan.io',
@@ -106,8 +88,6 @@ export const NETWORK_REGISTRY: Record<NetworkSlug, NetworkMeta> = {
     chain: optimismGoerli, envPrefix: 'OPTIMISM_GOERLI', explorerUrl: 'https://goerli-optimism.etherscan.io',
     confirmations: 2, timeout: 30_000, currency: 'ETH',
   },
-
-  // Mainnets
   ethereum: {
     slug: 'ethereum', chainId: 1, tier: 'mainnet', label: 'Ethereum',
     chain: mainnet, envPrefix: 'ETHEREUM', explorerUrl: 'https://etherscan.io',
@@ -140,42 +120,29 @@ export const NETWORK_REGISTRY: Record<NetworkSlug, NetworkMeta> = {
   },
 };
 
-// ─── Helpers ────────────────────────────────────────────────
-
-/** Resolve the default chain slug from env. */
 export function getDefaultChainSlug(): NetworkSlug {
   const raw = process.env.NEXT_PUBLIC_DEFAULT_CHAIN;
   if (raw && raw in NETWORK_REGISTRY) return raw as NetworkSlug;
-  if (raw) {
-    console.warn(`[network] Unknown NEXT_PUBLIC_DEFAULT_CHAIN="${raw}", falling back`);
-  }
-  // In production (Vercel etc.), default to sepolia; locally default to hardhat
-  const fallback = process.env.NODE_ENV === 'production' ? 'sepolia' : 'hardhat';
-  return fallback;
+  return process.env.NODE_ENV === 'production' ? 'sepolia' : 'hardhat';
 }
 
-/** Get the NetworkMeta for the current default chain. */
 export function getDefaultNetwork(): NetworkMeta {
   return NETWORK_REGISTRY[getDefaultChainSlug()];
 }
 
-/** Returns `true` when the given chainId belongs to a mainnet. */
 export function isMainnet(chainId: number): boolean {
   return Object.values(NETWORK_REGISTRY).some(
     (n) => n.chainId === chainId && n.tier === 'mainnet',
   );
 }
 
-/** Lookup a NetworkMeta by chainId. */
 export function networkByChainId(chainId: number): NetworkMeta | undefined {
   return Object.values(NETWORK_REGISTRY).find((n) => n.chainId === chainId);
 }
 
-/** Build the list of Chain objects that wagmi should know about. */
 export function getEnabledChains(): [Chain, ...Chain[]] {
   const enableTestnets = process.env.NEXT_PUBLIC_ENABLE_TESTNETS !== 'false';
   const enableMainnets = process.env.NEXT_PUBLIC_ENABLE_MAINNETS === 'true';
-
   const enableLocal = process.env.NODE_ENV !== 'production';
   const chains: Chain[] = [];
 
@@ -185,7 +152,6 @@ export function getEnabledChains(): [Chain, ...Chain[]] {
     if (meta.tier === 'mainnet' && enableMainnets) { chains.push(meta.chain); continue; }
   }
 
-  // Guarantee the default chain is first (wagmi uses first chain as default)
   const defaultMeta = getDefaultNetwork();
   const idx = chains.findIndex((c) => c.id === defaultMeta.chainId);
   if (idx > 0) {
@@ -195,8 +161,6 @@ export function getEnabledChains(): [Chain, ...Chain[]] {
     chains.unshift(defaultMeta.chain);
   }
 
-  // wagmi requires at least one chain
   if (chains.length === 0) chains.push(sepolia);
-
   return chains as [Chain, ...Chain[]];
 }

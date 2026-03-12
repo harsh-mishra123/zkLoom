@@ -1,6 +1,5 @@
-export { CONTRACT_ADDRESSES, TARGET_CHAIN_ID } from './addresses';
+export { CONTRACT_ADDRESSES } from './addresses';
 
-// Re-export the full network system for new code
 export {
   getAddresses,
   getAddressesByChainId,
@@ -11,7 +10,6 @@ export {
   networkByChainId,
 } from '../networks';
 
-// Re-export the chain-aware hook
 export { useNetworkAddresses } from '../hooks/useNetworkAddresses';
 
 import marketAbi from '../abis/market.json';

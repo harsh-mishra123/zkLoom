@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield,
-  ShieldAlert,
   ArrowLeft,
   CheckCircle2,
   Clock,
@@ -26,14 +25,6 @@ export default function AdminPage() {
   const { address, isConnected } = useAccount();
   const { market: marketAddress, chainId } = useNetworkAddresses();
 
-  // Read contract owner
-  const { data: contractOwner } = useReadContract({
-    address: marketAddress,
-    abi: abis.market,
-    functionName: 'owner',
-    chainId,
-  });
-
   // Read market count
   const { data: marketCount } = useReadContract({
     address: marketAddress,
@@ -42,8 +33,6 @@ export default function AdminPage() {
     chainId,
   });
 
-  const owner = contractOwner as `0x${string}` | undefined;
-  const isOwner = isConnected && address && owner && address.toLowerCase() === owner.toLowerCase();
   const count = Number(marketCount || 0);
 
   // Not connected state
@@ -57,28 +46,6 @@ export default function AdminPage() {
           <Lock className="h-12 w-12 text-zinc-600 mb-4" />
           <h2 className="text-xl font-semibold text-white mb-2">Connect Wallet</h2>
           <p className="text-sm text-zinc-500">Connect your wallet to access the admin panel.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Not owner state
-  if (!isOwner) {
-    return (
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
-        <Link href="/markets" className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-white transition mb-8">
-          <ArrowLeft className="h-4 w-4" /> Back to Markets
-        </Link>
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <ShieldAlert className="h-12 w-12 text-red-500/60 mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">Access Denied</h2>
-          <p className="text-sm text-zinc-500 mb-1">Only the contract owner can resolve markets.</p>
-          <p className="text-xs text-zinc-600 font-mono mt-2">
-            Owner: {owner ? `${owner.slice(0, 6)}...${owner.slice(-4)}` : 'Loading...'}
-          </p>
-          <p className="text-xs text-zinc-600 font-mono">
-            You: {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : ''}
-          </p>
         </div>
       </div>
     );
@@ -103,7 +70,7 @@ export default function AdminPage() {
           </div>
         </div>
         <p className="text-sm text-zinc-500 mt-2 mb-8">
-          Resolve expired markets by setting the final outcome. This determines winners and triggers payouts.
+          Resolve markets that you created by setting the final outcome. This determines winners and triggers payouts.
         </p>
       </motion.div>
 
@@ -189,6 +156,7 @@ function MarketStatCount({ marketIds, type }: { marketIds: number[]; type: 'acti
 
 function AdminMarketRow({ marketId }: { marketId: number }) {
   const { market: marketAddress, chainId } = useNetworkAddresses();
+  const { address } = useAccount();
   const { writeContractAsync, isPending } = useWriteContract();
   const { switchChainAsync } = useSwitchChain();
   const connectedChainId = useChainId();
@@ -212,15 +180,16 @@ function AdminMarketRow({ marketId }: { marketId: number }) {
     );
   }
 
-  const [question, resolutionTime, outcome, resolved, totalYes, totalNo, totalPool] = market as [string, bigint, bigint, boolean, bigint, bigint, bigint];
+  const [question, resolutionTime, outcome, resolved, totalYes, totalNo, totalPool, creator] = market as [string, bigint, bigint, boolean, bigint, bigint, bigint, string];
   const resolutionDate = new Date(Number(resolutionTime) * 1000);
   const now = new Date();
   const isActive = !resolved && resolutionDate > now;
   const isExpired = !resolved && resolutionDate <= now;
+  const isCreator = address && creator && address.toLowerCase() === creator.toLowerCase();
   // Show resolve buttons for ALL unresolved markets — the contract
   // enforces block.timestamp >= resolutionTime and will revert if too early.
   // This avoids wall-clock vs blockchain-time mismatches (e.g. Hardhat fast-forward).
-  const canResolve = !resolved;
+  const canResolve = !resolved && isCreator;
 
   const handleResolve = async (outcomeValue: 1 | 2) => {
     try {

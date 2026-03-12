@@ -215,7 +215,7 @@ export default function MarketDetail() {
     </div>
   );
 
-  const [question, resolutionTime, outcome, resolved, totalYes, totalNo, totalPool] = market as [string, bigint, bigint, boolean, bigint, bigint, bigint];
+  const [question, resolutionTime, outcome, resolved, totalYes, totalNo, totalPool, creator] = market as [string, bigint, bigint, boolean, bigint, bigint, bigint, string];
   const [userCommitment, userAmount, userSide, userRevealed, userClaimed] = (userPrediction as [bigint, bigint, boolean, boolean, boolean]) || [BigInt(0), BigInt(0), false, false, false];
   const payout = payoutData as bigint | undefined;
 

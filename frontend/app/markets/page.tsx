@@ -251,7 +251,7 @@ function MarketCard({ marketId }: { marketId: number }) {
     );
   }
 
-  const [question, resolutionTime, outcome, resolved, totalYes, totalNo, totalPool] = market as [string, bigint, bigint, boolean, bigint, bigint, bigint];
+  const [question, resolutionTime, outcome, resolved, totalYes, totalNo, totalPool, creator] = market as [string, bigint, bigint, boolean, bigint, bigint, bigint, string];
   const resolutionDate = new Date(Number(resolutionTime) * 1000);
   const now = new Date();
   const isActive = !resolved && resolutionDate > now;

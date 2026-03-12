@@ -1,38 +1,26 @@
-'use client';
-
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 
 const LOCAL_CHAIN_IDS = new Set([31337, 1337]);
-const FUNDED_KEY = 'zkpredict_local_funded';
 
 /**
- * Auto-funds the connected wallet on local networks (Hardhat/Ganache).
- * Uses hardhat_setBalance RPC to give the user 1000 ETH for testing.
- * Only runs once per address per session.
+ * Auto-funds the connected wallet on local dev chains (Hardhat / Ganache).
+ * No-op on testnets and mainnets.
  */
 export function useAutoFundLocal() {
-  const { address } = useAccount();
   const chainId = useChainId();
-  const funded = useRef<Set<string>>(new Set());
+  const { address, isConnected } = useAccount();
 
   useEffect(() => {
-    if (!address || !LOCAL_CHAIN_IDS.has(chainId)) return;
+    if (!isConnected || !address || !LOCAL_CHAIN_IDS.has(chainId)) return;
 
-    const key = `${chainId}:${address}`;
-    // Skip if already funded this session
-    if (funded.current.has(key)) return;
+    const rpcUrl =
+      chainId === 1337
+        ? process.env.NEXT_PUBLIC_GANACHE_RPC_URL || 'http://127.0.0.1:7545'
+        : 'http://127.0.0.1:8545';
 
-    // Skip if funded in a recent browser session
-    try {
-      const stored = JSON.parse(sessionStorage.getItem(FUNDED_KEY) || '[]');
-      if (stored.includes(key)) { funded.current.add(key); return; }
-    } catch {}
-
-    // Fund: 1000 ETH in hex (0x3635C9ADC5DEA00000)
-    const rpcUrl = chainId === 31337
-      ? (process.env.NEXT_PUBLIC_LOCAL_RPC_URL || 'http://127.0.0.1:8545')
-      : (process.env.NEXT_PUBLIC_GANACHE_RPC_URL || 'http://127.0.0.1:7545');
+    // Fund the wallet with 1000 ETH via hardhat_setBalance / evm_setAccountBalance
+    const amount = '0x' + (BigInt('1000000000000000000000') ).toString(16); // 1000 ETH
 
     fetch(rpcUrl, {
       method: 'POST',
@@ -40,22 +28,11 @@ export function useAutoFundLocal() {
       body: JSON.stringify({
         jsonrpc: '2.0',
         method: 'hardhat_setBalance',
-        params: [address, '0x3635C9ADC5DEA00000'],
-        id: Date.now(),
+        params: [address, amount],
+        id: 1,
       }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.error) {
-          funded.current.add(key);
-          try {
-            const stored = JSON.parse(sessionStorage.getItem(FUNDED_KEY) || '[]');
-            stored.push(key);
-            sessionStorage.setItem(FUNDED_KEY, JSON.stringify(stored));
-          } catch {}
-          console.log(`[dev] Funded ${address} with 1000 ETH on chain ${chainId}`);
-        }
-      })
-      .catch(() => {});
-  }, [address, chainId]);
+    }).catch(() => {
+      // Silently fail — node might not be running
+    });
+  }, [chainId, address, isConnected]);
 }

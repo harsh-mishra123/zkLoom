@@ -142,7 +142,7 @@ function BetRow({
     );
   }
 
-  const [question, resolutionTime, outcome, resolved, totalYes, totalNo, totalPool] = market as [string, bigint, bigint, boolean, bigint, bigint, bigint];
+  const [question, resolutionTime, outcome, resolved, totalYes, totalNo, totalPool, creator] = market as [string, bigint, bigint, boolean, bigint, bigint, bigint, string];
   const resolutionDate = new Date(Number(resolutionTime) * 1000);
   const isActive = !resolved && resolutionDate > new Date();
 
